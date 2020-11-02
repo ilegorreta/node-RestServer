@@ -1,43 +1,28 @@
 require('./config/config');
 
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
-const bodyParser = require('body-parser');
 
+const bodyParser = require('body-parser');
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
-
-// parse application/json
+    // parse application/json
 app.use(bodyParser.json())
 
-app.get('/user', function(req, res) {
-    res.json('Get User')
-})
+app.use(require('./routes/user.js'));
 
-app.post('/user', function(req, res) {
-    let body = req.body;
-    if (body.nombre === undefined) {
-        res.status(400).json({
-            ok: false,
-            message: 'Please enter your name'
-        })
-    } else {
-        res.json({
-            person: body
-        });
-    }
-})
-
-app.put('/user/:id', function(req, res) {
-    let id = req.params.id;
-    res.json({
-        id
-    });
-})
-
-app.delete('/user', function(req, res) {
-    res.json('Delete User')
-})
+//Here we need to specify the port of MongoDB running on our computer
+// 'cafe' is the name of our DB. If it doesn't exist, Mongo will create it
+mongoose.connect('mongodb://localhost:27017/cafe', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true
+}, (err, res) => {
+    if (err) throw err;
+    console.log('DataBase ONLINE');
+});
 
 app.listen(process.env.PORT, () => {
     console.log('Listening to port ', process.env.PORT);
